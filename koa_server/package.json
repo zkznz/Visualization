@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "cors": "^2.8.5",
     "koa": "^2.14.2",
     "nodemon": "^2.0.22"
   }

@@ -4,6 +4,9 @@ const app = new Koa();
 const durationMiddle = require('./middleware/koa_response_duration')
 const headerMiddle = require('./middleware/koa_response_header');
 const dataMiddle = require('./middleware/koa_response_data');
+const cors = require('cors');
+
+app.use(cors);
 app.use(durationMiddle);
 //响应请求头中间件
 app.use(headerMiddle);

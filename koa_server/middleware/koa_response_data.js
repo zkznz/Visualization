@@ -8,7 +8,16 @@ module.exports = async (ctx, next) => {
     filePath = '../data' + filePath + '.json';
     filePath = path.join(__dirname, filePath);
     //读取文件数据返回给客户端
-    let res = await fileUtils.getFileJsonData(filePath);
-    ctx.response.body = res
+    try {
+        let res = await fileUtils.getFileJsonData(filePath);
+        ctx.response.body = res
+
+    } catch (error) {
+        const errMsg = {
+            status: 404,
+            msg: "读取文件内容失败，文件资源不存在"
+        }
+        ctx.response.body = JSON.stringify(errMsg);
+    }
     await next();
 }
