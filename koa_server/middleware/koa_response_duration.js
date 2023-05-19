@@ -1,5 +1,5 @@
 //计算服务器消耗时长的中间件
-module.exports = (ctx, next) => {
+module.exports = async (ctx, next) => {
     let start = Date.now();
     await next();
     let end = Date.now();
