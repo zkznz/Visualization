@@ -4,10 +4,10 @@ const service = axios.create({
     baseURL: process.env.VUE_APP_BASE_URL + '/api',
     timeout: 7000
 })
-service.interceptors.request((config) => {
+service.interceptors.request.use((config) => {
     return config;
 })
-service.interceptors.response((res) => {
+service.interceptors.response.use((res) => {
     return res;
 })
 
