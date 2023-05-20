@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <div class="chart">
+        <div class="chart" ref="chart">
 
         </div>
     </div>
@@ -11,9 +11,18 @@ export default {
     name: 'Seller',
     data() {
         return {
+            chart: null
         };
     },
-    methods: {},
+    mounted() {
+        this.initCharts();
+    },
+    methods: {
+        //初始化echarts实例
+        initCharts() {
+            this.chart = this.$echarts.init(this.$refs.chart);
+        }
+    },
 };
 </script>
 <style lang="less" scoped></style>
