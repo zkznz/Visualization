@@ -29,7 +29,7 @@ export default {
     methods: {
         //初始化echarts实例
         initCharts() {
-            this.chart = this.$echarts.init(this.$refs.chart);
+            this.chart = this.$echarts.init(this.$refs.chart, 'dark');
             this.chart.on('mouseover', () => clearInterval(this.timer))
             this.chart.on('mouseout', () => this.startInterval())
         },
@@ -55,6 +55,21 @@ export default {
             let sellerNames = showData.map(item => item.name);
             let sellerValue = showData.map(item => item.value);
             let option = {
+                title: {
+                    text: '▎商家销售统计',
+                    textStyle: {
+                        fontSize: 66,
+                    },
+                    top: 20,
+                    left: 20
+                },
+                grid: {
+                    top: '20%',
+                    left: '3%',
+                    right: '6%',
+                    bottom: '3%',
+                    containLabel: true
+                },
                 xAxis: {
                     type: 'value',
                 },
@@ -62,10 +77,49 @@ export default {
                     type: 'category',
                     data: sellerNames
                 },
+                tooltip: {
+                    trigger: 'item',
+
+                },
                 series: [
                     {
                         type: 'bar',
-                        data: sellerValue
+                        data: sellerValue,
+                        label: {
+                            show: true,
+                            position: 'right',
+                            color: 'white'
+                        },
+                        itemStyle: {
+                            barBorderRadius: [0, 33, 33, 0],
+                            color: {
+                                type: 'linear',
+                                x: 0,
+                                y: 0,
+                                x1: 1,
+                                y: 0,
+                                colorStops: [
+                                    {
+                                        offset: 0, color: '#5052EE' // 0% 处的颜色
+                                    },
+                                    {
+                                        offset: 1, color: '#AB6EE5' // 100% 处的颜色
+                                    }
+                                ],
+                            }
+                            // new this.$echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                            //     //百分之0状态下的颜色值
+                            //     {
+                            //         offset: 0,
+                            //         color: '#5052EE'
+                            //     },
+                            //     //百分之100状态之下的颜色值
+                            //     {
+                            //         offset: 1,
+                            //         color: '#AB6EE5'
+                            //     }
+                            // ])
+                        }
                     }
                 ]
             }
