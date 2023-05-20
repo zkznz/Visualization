@@ -1,7 +1,6 @@
 <template>
     <div class="container">
         <div class="chart" ref="chart">
-
         </div>
     </div>
 </template>
@@ -20,41 +19,22 @@ export default {
         };
     },
     mounted() {
-        this.initCharts();
+        this.initChart();
         this.getData();
+        window.addEventListener('resize', this.screenAdapter);
+        //页面一加载进行屏幕适配
+        this.screenAdapter();
     },
     destroyed() {
         clearInterval(this.timer);
+        window.removeEventListener('resize', this.screenAdapter);
     },
     methods: {
         //初始化echarts实例
-        initCharts() {
+        initChart() {
             this.chart = this.$echarts.init(this.$refs.chart, 'dark');
-            this.chart.on('mouseover', () => clearInterval(this.timer))
-            this.chart.on('mouseout', () => this.startInterval())
-        },
-        //获取数据
-        async getData() {
-            let { data: res } = await this.$http({
-                url: '/seller',
-                method: 'get'
-            })
-            this.allData = res;
-            this.allData.sort((a, b) => a.value - b.value);
-            this.totalPage = res.length % 5 === 0 ? res.length / 5 : Math.ceil(res.length / 5);
-            this.updateChart();
-            this.startInterval();
-        },
-        //更新图表
-        updateChart() {
-            //起始下标
-            let start = (this.currentPage - 1) * 5;
-            //结束下标
-            let end = this.currentPage * 5;
-            let showData = this.allData.slice(start, end);
-            let sellerNames = showData.map(item => item.name);
-            let sellerValue = showData.map(item => item.value);
-            let option = {
+            //初始化配置
+            let initOption = {
                 title: {
                     text: '▎商家销售统计',
                     textStyle: {
@@ -75,7 +55,6 @@ export default {
                 },
                 yAxis: {
                     type: 'category',
-                    data: sellerNames
                 },
                 tooltip: {
                     trigger: 'item',
@@ -84,7 +63,6 @@ export default {
                 series: [
                     {
                         type: 'bar',
-                        data: sellerValue,
                         label: {
                             show: true,
                             position: 'right',
@@ -123,7 +101,43 @@ export default {
                     }
                 ]
             }
-            this.chart.setOption(option);
+            this.chart.setOption(initOption);
+            this.chart.on('mouseover', () => clearInterval(this.timer))
+            this.chart.on('mouseout', () => this.startInterval())
+        },
+        //获取数据
+        async getData() {
+            let { data: res } = await this.$http({
+                url: '/seller',
+                method: 'get'
+            })
+            this.allData = res;
+            this.allData.sort((a, b) => a.value - b.value);
+            this.totalPage = res.length % 5 === 0 ? res.length / 5 : Math.ceil(res.length / 5);
+            this.updateChart();
+            this.startInterval();
+        },
+        //更新图表
+        updateChart() {
+            //起始下标
+            let start = (this.currentPage - 1) * 5;
+            //结束下标
+            let end = this.currentPage * 5;
+            let showData = this.allData.slice(start, end);
+            let sellerNames = showData.map(item => item.name);
+            let sellerValue = showData.map(item => item.value);
+            //更新数据配置项
+            let dataOption = {
+                yAxis: {
+                    data: sellerNames
+                },
+                series: [
+                    {
+                        data: sellerValue,
+                    }
+                ]
+            }
+            this.chart.setOption(dataOption);
         },
         startInterval() {
             if (this.timer);
@@ -132,6 +146,28 @@ export default {
                 this.currentPage = this.currentPage >= this.totalPage ? 1 : ++this.currentPage;
                 this.updateChart();
             }, 3000)
+        },
+        //图表屏幕适配
+        screenAdapter() {
+            const titleFontSize = this.$refs.chart.offsetWidth / 100 * 3.6;
+            let adapterOption = {
+                title: {
+                    textStyle: {
+                        fontSize: titleFontSize,
+                    },
+                },
+                tooltip: {
+                    trigger: 'item',
+
+                },
+                series: {
+                    itemStyle: {
+                        barBorderRadius: [0, titleFontSize / 2, titleFontSize / 2, 0],
+                    }
+                }
+            }
+            this.chart.setOption(adapterOption);
+            this.chart.resize();
         }
     },
 };
