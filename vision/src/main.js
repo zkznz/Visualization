@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 import axios from 'axios'
 import echarts from 'echarts'
+import "@/assets/css/global.less"
 
 Vue.config.productionTip = false
 Vue.prototype.$http = axios
