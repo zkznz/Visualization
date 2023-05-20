@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 import * as echarts from 'echarts'
 import "@/assets/css/global.less"
+import "@/assets/font/iconfont.css"
 import request from '@/utils/request'
 
 Vue.config.productionTip = false

@@ -1,7 +1,13 @@
 <template>
     <div class="container">
+        <div class="title" :style="comStyle">
+            <span>{{ '▎ ' + showTitle }}</span>
+            <span :style="comStyle" class="iconfont title-icon" @click="showType = !showType">&#xe6eb</span>
+            <div :style="marginStyle" class="select-list" v-show="showType" v-for="item in selectType" :key="item.key">
+                <div class="select-item" @click="handleSelect(item.key)">{{ item.text }}</div>
+            </div>
+        </div>
         <div class="chart" ref="chart">
-            cc
         </div>
     </div>
 </template>
@@ -12,29 +18,57 @@ export default {
     data() {
         return {
             chart: null,
-            allData: [],
+            allData: null,
             timer: null,
             currentPage: 1,
             totalPage: 1,
+            showType: false,
+            choiceType: 'map', //选择的数据类型
+            titleFontSize: 0
         };
+    },
+    computed: {
+        //下拉列表选项
+        selectType() {
+            if (!this.allData)
+                return [];
+            else {
+                return this.allData.type.filter(item => item.key !== this.choiceType)
+            }
+
+        },
+        //显示标题
+        showTitle() {
+            if (!this.allData)
+                return ''
+            else
+                return this.allData[this.choiceType].title
+        },
+        // 设置给标题的样式
+        comStyle() {
+            return {
+                fontSize: this.titleFontSize + 'px'
+            }
+        },
+        marginStyle() {
+            return {
+                marginLeft: this.titleFontSize + 'px'
+            }
+        }
     },
     mounted() {
         this.initChart();
         this.getData();
+        window.addEventListener('resize', this.screenAdapter);
         this.screenAdapter();
+    },
+    destroyed() {
+        window.removeEventListener('resize', this.screenAdapter);
     },
     methods: {
         initChart() {
             this.chart = this.$echarts.init(this.$refs.chart, 'dark');
             let initOption = {
-                title: {
-                    text: '▎地区销量趋势',
-                    textStyle: {
-                        fontSize: 60,
-                    },
-                    top: 40,
-                    left: 20
-                },
                 xAxis: {
                     type: 'category',
                     boundaryGap: false
@@ -44,10 +78,8 @@ export default {
                 },
                 legend: {
                     left: 20,
-                    top: '15%',
+                    top: '25%',
                     icon: 'circle',
-                    itemWidth: 50,
-                    itemHeight: 50
                 },
                 grid: {
                     left: '3%',
@@ -85,7 +117,7 @@ export default {
                 'rgba(250, 105, 0, 0)'
             ]
             let timeArr = this.allData.common.month;
-            let valueArr = this.allData.map.data;
+            let valueArr = this.allData[this.choiceType].data;
             let seriesArr = valueArr.map((item, index) => {
                 return {
                     type: 'line',
@@ -101,7 +133,6 @@ export default {
                     }
                 }
             })
-            console.log(seriesArr);
             let legendArr = valueArr.map(item => {
                 return item.name
             });
@@ -117,9 +148,43 @@ export default {
             this.chart.setOption(dataOption);
         },
         screenAdapter() {
-            this.$echarts.resize();
+            this.titleFontSize = this.$refs.chart.offsetWidth / 100 * 3
+            let adapterOption = {
+                legend: {
+                    itemWidth: this.titleFontSize,
+                    itemHeight: this.titleFontSize,
+                    itemGap: this.titleFontSize,
+                    textStyle: {
+                        fontSize: this.titleFontSize / 2
+                    }
+                }
+            }
+            this.chart.setOption(adapterOption)
+            this.chart.resize();
+        },
+        handleSelect(type) {
+            this.choiceType = type;
+            this.updateChart();
+            this.showType = false;
         }
     },
 };
 </script>
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.title {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    color: #fff;
+    z-index: 10;
+
+    .title-icon {
+        margin-left: 10px;
+        cursor: pointer;
+    }
+
+    .select-item {
+        cursor: pointer;
+    }
+}
+</style>
