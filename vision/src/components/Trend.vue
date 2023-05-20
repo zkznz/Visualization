@@ -21,6 +21,7 @@ export default {
     mounted() {
         this.initChart();
         this.getData();
+        this.screenAdapter();
     },
     methods: {
         initChart() {
@@ -67,20 +68,6 @@ export default {
             this.updateChart();
         },
         updateChart() {
-            let timeArr = this.allData.common.month;
-            let valueArr = this.allData.map.data;
-            let seriesArr = valueArr.map(item => {
-                return {
-                    type: 'line',
-                    name: item.name,
-                    data: item.data,
-                    stack: 'map',
-                    smooth: 'true'
-                }
-            })
-            let legendArr = valueArr.map(item => {
-                return item.name
-            });
             // 半透明的颜色值
             const colorArr1 = [
                 'rgba(11, 168, 44, 0.5)',
@@ -97,6 +84,27 @@ export default {
                 'rgba(254, 33, 30, 0)',
                 'rgba(250, 105, 0, 0)'
             ]
+            let timeArr = this.allData.common.month;
+            let valueArr = this.allData.map.data;
+            let seriesArr = valueArr.map((item, index) => {
+                return {
+                    type: 'line',
+                    name: item.name,
+                    data: item.data,
+                    stack: 'map',
+                    smooth: 'true',
+                    areaStyle: {
+                        color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: colorArr1[index] },
+                            { offset: 1, color: colorArr2[index] }
+                        ])
+                    }
+                }
+            })
+            console.log(seriesArr);
+            let legendArr = valueArr.map(item => {
+                return item.name
+            });
             let dataOption = {
                 xAxis: {
                     data: timeArr
@@ -109,7 +117,7 @@ export default {
             this.chart.setOption(dataOption);
         },
         screenAdapter() {
-
+            this.$echarts.resize();
         }
     },
 };
