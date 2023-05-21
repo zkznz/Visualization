@@ -2,9 +2,9 @@
     <div class="container">
         <div class="chart" ref="chart">
         </div>
-        <span class="iconfont arr-left" @click="toLeft">&#xe6ef;</span>
-        <span class="iconfont arr-right" @click="toRight">&#xe6ed;</span>
-        <span class="cat-name">{{ cartName }}</span>
+        <span class="iconfont arr-left" :style="comStyle" @click="toLeft">&#xe6ef;</span>
+        <span class="iconfont arr-right" :style="comStyle" @click="toRight">&#xe6ed;</span>
+        <span class="cat-name" :style="comStyle">{{ cartName }}</span>
     </div>
 </template>
 
@@ -16,6 +16,7 @@ export default {
             chart: null,
             allData: null,
             currentIndex: 0, //一级分类下标
+            titleFontSize: 0,
         };
     },
     computed: {
@@ -24,6 +25,9 @@ export default {
                 return '';
             else
                 return this.allData[this.currentIndex].name
+        },
+        comStyle() {
+            return { fontSize: this.titleFontSize + 'px' }
         }
     },
     mounted() {
@@ -64,6 +68,7 @@ export default {
                 },
                 series: [{
                     type: 'pie',
+                    top: '15%',
                     label: {
                         show: false,
                         color: 'inherit'
@@ -107,11 +112,28 @@ export default {
         },
         //图表适配
         screenAdapter() {
-            let titleFontSize = this.$refs.chart.offsetWidth / 100 * 3.6;
+            this.titleFontSize = this.$refs.chart.offsetWidth / 100 * 3.6;
             let adapterOption = {
+                title: {
+                    textStyle: {
+                        fontSize: this.titleFontSize
+                    }
+                },
                 series: {
                     label: {
-                        fontSize: 20
+                        fontSize: this.titleFontSize / 2
+                    }
+                },
+                legend: {
+                    itemWidth: this.titleFontSize / 2,
+                    itemHeight: this.titleFontSize / 2,
+                    textStyle: {
+                        fontSize: this.titleFontSize / 2
+                    }
+                },
+                tooltip: {
+                    textStyle: {
+                        fontSize: this.titleFontSize / 2.5
                     }
                 }
             };
