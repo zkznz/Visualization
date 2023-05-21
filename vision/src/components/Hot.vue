@@ -68,7 +68,6 @@ export default {
                 },
                 series: [{
                     type: 'pie',
-                    top: '15%',
                     label: {
                         show: false,
                         color: 'inherit'
@@ -119,14 +118,17 @@ export default {
                         fontSize: this.titleFontSize
                     }
                 },
-                series: {
+                series: [{
                     label: {
                         fontSize: this.titleFontSize / 2
-                    }
-                },
+                    },
+                    radius: this.titleFontSize * 4.5,
+                    center: ['50%', '57%']
+                }],
                 legend: {
                     itemWidth: this.titleFontSize / 2,
                     itemHeight: this.titleFontSize / 2,
+                    itemGap: this.titleFontSize / 2,
                     textStyle: {
                         fontSize: this.titleFontSize / 2
                     }
