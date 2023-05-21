@@ -62,9 +62,19 @@ export default {
             this.chart.on('click', async arg => {
                 const provinceInfo = getProvinceMapInfo(arg.name);
                 if (!this.mapData[provinceInfo.key]) {
-                    let res = await axios.get("http://localhost:8080" + provinceInfo.path);
-                    this.mapData[provinceInfo.key] = res.data;
-                    this.$echarts.registerMap(provinceInfo.key, this.mapData[provinceInfo.key]);
+                    try {
+                        let res = await axios.get("http://localhost:8080" + provinceInfo.path);
+                        this.mapData[provinceInfo.key] = res.data;
+                        this.$echarts.registerMap(provinceInfo.key, this.mapData[provinceInfo.key]);
+                    } catch (error) {
+                        this.chart.setOption({
+                            geo: {
+                                map: 'china'
+                            }
+                        })
+                        return
+                    }
+
                 }
                 let changeOption = {
                     geo: {
