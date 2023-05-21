@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="page">
         <Map></Map>
     </div>
 </template>
@@ -8,6 +8,7 @@
 import Map from '@/components/Map.vue';
 export default {
     name: 'MapPage',
+    components: { Map },
     data() {
         return {
         };

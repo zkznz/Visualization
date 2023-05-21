@@ -1,6 +1,7 @@
 <template>
-    <div>
-        <div class="chart" ref="chart"></div>
+    <div class="container">
+        <div class="chart" ref="chart">
+        </div>
     </div>
 </template>
 

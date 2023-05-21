@@ -1,16 +1,20 @@
 <template>
-    <div>
-        <div class="chart" ref="chart"></div>
+    <div class="container">
+        <div class="chart" ref="chart">
+        </div>
     </div>
 </template>
 
 <script>
+import axios from 'axios';
 export default {
     name: 'Map',
     data() {
         return {
             chart: null,
             allData: [],
+            seriesArr: [],
+            legendData: [],
             titleFontSize: 0
         };
     },
@@ -24,10 +28,32 @@ export default {
         window.removeEventListener('resize', this.screenAdapter);
     },
     methods: {
-        initChart() {
-            this.chart = this.$echarts.init(this.$refs.chart);
-            let initOption = {
+        async initChart() {
+            let res = await axios.get("http://localhost:8080/static/map/china.json");
+            this.$echarts.registerMap('china', res.data);
 
+            this.chart = this.$echarts.init(this.$refs.chart, 'dark');
+            let initOption = {
+                geo: {
+                    type: 'map',
+                    map: 'china',
+                    top: '5%',
+                    bottom: '5%',
+                    itemStyle: {
+                        areaColor: '#2E72BF',
+                        borderColor: '#333'
+                    }
+                },
+                title: {
+                    text: '▎商家分布',
+                    top: 20,
+                    left: 20
+                },
+                legend: {
+                    left: '3%',
+                    bottom: '3%',
+                    orient: 'vertical'
+                }
             };
             this.chart.setOption(initOption);
         },
@@ -37,11 +63,28 @@ export default {
                 url: '/map'
             });
             this.allData = res;
+            this.seriesArr = this.allData.map(item => {
+                return {
+                    type: 'effectScatter',
+                    name: item.name,
+                    data: item.children,
+                    coordinateSystem: 'geo',
+                    rippleEffect: {
+                        scale: 5,
+                        brushType: 'stroke'
+                    }
+                }
+            })
+            this.legendData = this.allData.map(item => item.name);
+            this.updateChart();
         },
         //更新图表
         updateChart() {
             let dataOption = {
-
+                series: this.seriesArr,
+                legend: {
+                    data: this.legendData
+                }
             };
             this.chart.setOption(dataOption);
         },
@@ -51,8 +94,8 @@ export default {
             let adapterOption = {
 
             };
-            this.chart.setOption(adapterOption);
-            this.chart.resize();
+            // this.chart.setOption(adapterOption);
+            // this.chart.resize();
         }
     },
 };
