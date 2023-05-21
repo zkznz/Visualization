@@ -12,7 +12,6 @@ export default {
         return {
             chart: null,
             allData: [],
-            titleFontSize: 0
         };
     },
     mounted() {
@@ -48,7 +47,7 @@ export default {
         },
         //图表适配
         screenAdapter() {
-            this.titleFontSize = this.$refs.chart.offsetWidth * 100 / 3.6;
+            let titleFontSize = this.$refs.chart.offsetWidth / 100 * 3.6;
             let adapterOption = {
 
             };

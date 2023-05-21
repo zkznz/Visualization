@@ -120,15 +120,28 @@ export default {
         },
         //图表适配
         screenAdapter() {
-            this.titleFontSize = this.$refs.chart.offsetWidth * 100 / 3.6;
+            let titleFontSize = this.$refs.chart.offsetWidth / 100 * 3.6;
             let adapterOption = {
-
+                title: {
+                    textStyle: {
+                        fontSize: titleFontSize
+                    }
+                },
+                series: [{
+                    barWidth: titleFontSize,
+                    itemStyle: {
+                        borderRadius: [titleFontSize / 2, titleFontSize / 2, 0, 0]
+                    }
+                }]
             };
             this.chart.setOption(adapterOption);
             this.chart.resize();
         },
         //平移动画实现
         startInterval() {
+            if (this.timer) {
+                clearInterval(this.timer)
+            }
             this.timer = setInterval(() => {
                 this.startIndex++;
                 this.endIndex++;
