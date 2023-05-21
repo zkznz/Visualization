@@ -12,17 +12,21 @@ export default {
         return {
             chart: null,
             allData: [],
-            titleFontSize: 0
+            timer: null,
+            startIndex: 0,   //平移动画展示数据起始下标
+            endIndex: 9      //移动画展示数据结束下标
         };
     },
     mounted() {
         this.initChart();
         this.getData();
+        this.startInterval();
         window.addEventListener('resize', this.screenAdapter);
         this.screenAdapter();
     },
     destroyed() {
         window.removeEventListener('resize', this.screenAdapter);
+        clearInterval(this.timer);
     },
     methods: {
         initChart() {
@@ -77,6 +81,11 @@ export default {
                 xAxis: {
                     data: provinceArr
                 },
+                dataZoom: [{
+                    show: false,
+                    startValue: this.startIndex,
+                    endValue: this.endIndex
+                }],
                 series: [
                     {
                         data: valueArr,
@@ -117,6 +126,18 @@ export default {
             };
             this.chart.setOption(adapterOption);
             this.chart.resize();
+        },
+        //平移动画实现
+        startInterval() {
+            this.timer = setInterval(() => {
+                this.startIndex++;
+                this.endIndex++;
+                if (this.endIndex > this.allData.length - 1) {
+                    this.startIndex = 0;
+                    this.endIndex = 9;
+                }
+                this.updateChart();
+            }, 2000)
         }
     },
 };
