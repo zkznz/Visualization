@@ -1,12 +1,13 @@
 <template>
     <div class="container">
-        <div class="chart" ref="chart">
+        <div class="chart" ref="chart" @dblclick="backMap">
         </div>
     </div>
 </template>
 
 <script>
 import axios from 'axios';
+import { getProvinceMapInfo } from '@/utils/map_utils'
 export default {
     name: 'Map',
     data() {
@@ -15,6 +16,8 @@ export default {
             allData: [],
             seriesArr: [],
             legendData: [],
+            //省份矢量坐标
+            mapData: {},
             titleFontSize: 0
         };
     },
@@ -55,6 +58,21 @@ export default {
                 }
             };
             this.chart.setOption(initOption);
+            //监听点击地图事件
+            this.chart.on('click', async arg => {
+                const provinceInfo = getProvinceMapInfo(arg.name);
+                if (!this.mapData[provinceInfo.key]) {
+                    let res = await axios.get("http://localhost:8080" + provinceInfo.path);
+                    this.mapData[provinceInfo.key] = res.data;
+                    this.$echarts.registerMap(provinceInfo.key, this.mapData[provinceInfo.key]);
+                }
+                let changeOption = {
+                    geo: {
+                        map: provinceInfo.key
+                    }
+                }
+                this.chart.setOption(changeOption);
+            })
         },
         //获取数据
         async getData() {
@@ -107,6 +125,14 @@ export default {
             };
             this.chart.setOption(adapterOption);
             this.chart.resize();
+        },
+        //双击返回中国地图
+        backMap() {
+            this.chart.setOption({
+                geo: {
+                    map: 'china'
+                }
+            })
         }
     },
 };
