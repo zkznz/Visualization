@@ -12,6 +12,8 @@ export default {
         return {
             chart: null,
             allData: null,
+            currentPage: 1,
+            timer: null
         };
     },
     mounted() {
@@ -22,10 +24,11 @@ export default {
     },
     destroyed() {
         window.removeEventListener('resize', this.screenAdapter);
+        clearInterval(this.timer);
     },
     methods: {
         initChart() {
-            this.chart = this.$echarts.init(this.$refs.chart);
+            this.chart = this.$echarts.init(this.$refs.chart, 'dark');
             let initOption = {
                 title: {
                     text: '▎库存销售量',
@@ -34,6 +37,8 @@ export default {
                 },
             };
             this.chart.setOption(initOption);
+            this.chart.on('mouseover', () => clearInterval(this.timer))
+            this.chart.on('mouseout', () => this.startInterval())
         },
         //获取数据
         async getData() {
@@ -42,6 +47,7 @@ export default {
             });
             this.allData = res;
             this.updateChart();
+            this.startInterval();
         },
         //更新图表
         updateChart() {
@@ -59,18 +65,49 @@ export default {
                 ['#5052EE', '#AB6EE5'],
                 ['#23E5E5', '#2E72BF']
             ]
-            const dateArr = this.allData.slice(0, 5)
-
+            const start = (this.currentPage - 1) * 5;
+            const end = this.currentPage * 5;
+            const dateArr = this.allData.slice(start, end)
             const seriesArr = dateArr.map((item, index) => {
                 return {
                     type: 'pie',
                     radius: [110, 100],
                     center: centerArr[index],
                     data: [
-                        { value: item.sales },
-                        { value: item.stock }
-                    ]
-
+                        {
+                            name: item.name + '\n' + item.sales,
+                            value: item.sales,
+                            itemStyle: {
+                                color: new this.$echarts.graphic.LinearGradient(0, 1, 0, 0, [
+                                    {
+                                        offset: 0,
+                                        color: colorArr[index][0]
+                                    },
+                                    {
+                                        offset: 1,
+                                        color: colorArr[index][1]
+                                    }
+                                ])
+                            }
+                        },
+                        {
+                            name: item.name + '\n' + item.sales,
+                            value: item.stock,
+                            itemStyle: {
+                                color: '#333843'
+                            }
+                        }
+                    ],
+                    labelLine: {
+                        show: false
+                    },
+                    label: {
+                        color: colorArr[index][0],
+                        position: 'center'
+                    },
+                    emphasis: {
+                        scale: false// 关闭鼠标移入到饼图时的动画效果
+                    },
                 }
             })
             let dataOption = {
@@ -81,11 +118,62 @@ export default {
         //图表适配
         screenAdapter() {
             let titleFontSize = this.$refs.chart.offsetWidth / 100 * 3.6;
+            const innerRadius = titleFontSize * 2
+            const outterRadius = innerRadius * 1.125
             let adapterOption = {
-
+                title: {
+                    textStyle: {
+                        fontSize: titleFontSize
+                    }
+                },
+                series: [
+                    {
+                        type: 'pie',
+                        radius: [outterRadius, innerRadius],
+                        label: {
+                            fontSize: titleFontSize / 2
+                        }
+                    },
+                    {
+                        type: 'pie',
+                        radius: [outterRadius, innerRadius],
+                        label: {
+                            fontSize: titleFontSize / 2
+                        }
+                    },
+                    {
+                        type: 'pie',
+                        radius: [outterRadius, innerRadius],
+                        label: {
+                            fontSize: titleFontSize / 2
+                        }
+                    },
+                    {
+                        type: 'pie',
+                        radius: [outterRadius, innerRadius],
+                        label: {
+                            fontSize: titleFontSize / 2
+                        }
+                    },
+                    {
+                        type: 'pie',
+                        radius: [outterRadius, innerRadius],
+                        label: {
+                            fontSize: titleFontSize / 2
+                        }
+                    }
+                ]
             };
             this.chart.setOption(adapterOption);
             this.chart.resize();
+        },
+        startInterval() {
+            if (this.timer)
+                clearInterval(this.timer);
+            this.timer = setInterval(() => {
+                this.currentPage = this.currentPage >= this.allData.length / 5 ? 1 : ++this.currentPage;
+                this.updateChart();
+            }, 5000)
         }
     },
 };
