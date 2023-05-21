@@ -1,13 +1,14 @@
 <template>
     <div class="page">
-        <Map></Map>
+        <Rank></Rank>
     </div>
 </template>
 
 <script>
-import Map from '@/components/Map.vue';
+import Rank from '@/components/Rank.vue';
 export default {
-    name: 'MapPage',
+    name: 'RankPage',
+    components: { Rank },
     data() {
         return {
         };
