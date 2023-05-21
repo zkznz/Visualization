@@ -7,7 +7,7 @@
 
 <script>
 export default {
-    name: 'Map',
+    name: 'Hot',
     data() {
         return {
             chart: null,
@@ -27,21 +27,32 @@ export default {
         initChart() {
             this.chart = this.$echarts.init(this.$refs.chart);
             let initOption = {
-
+                series: [{
+                    type: 'pie'
+                }]
             };
             this.chart.setOption(initOption);
         },
         //获取数据
         async getData() {
             let { data: res } = await this.$http({
-                url: '/map'
+                url: '/hotproduct'
             });
             this.allData = res;
+            this.updateChart();
         },
         //更新图表
         updateChart() {
+            const dataArr = this.allData.map(item => {
+                return {
+                    name: item.name,
+                    value: item.value,
+                }
+            })
             let dataOption = {
-
+                serise: [{
+                    data: dataArr
+                }]
             };
             this.chart.setOption(dataOption);
         },
