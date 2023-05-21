@@ -18,8 +18,8 @@ export default {
             titleFontSize: 0
         };
     },
-    mounted() {
-        this.initChart();
+    async mounted() {
+        await this.initChart()
         this.getData();
         window.addEventListener('resize', this.screenAdapter);
         this.screenAdapter();
@@ -31,7 +31,6 @@ export default {
         async initChart() {
             let res = await axios.get("http://localhost:8080/static/map/china.json");
             this.$echarts.registerMap('china', res.data);
-
             this.chart = this.$echarts.init(this.$refs.chart, 'dark');
             let initOption = {
                 geo: {
@@ -90,12 +89,24 @@ export default {
         },
         //图表适配
         screenAdapter() {
-            this.titleFontSize = this.$refs.chart.offsetWidth * 100 / 3.6;
+            const titleFontSize = this.$refs.chart.offsetWidth / 100 * 3.6;
             let adapterOption = {
-
+                title: {
+                    textStyle: {
+                        fontSize: titleFontSize
+                    }
+                },
+                legend: {
+                    itemWidth: titleFontSize / 2,
+                    itemHeight: titleFontSize / 2,
+                    itemGap: titleFontSize / 2,
+                    textStyle: {
+                        fontSize: titleFontSize / 2
+                    }
+                },
             };
-            // this.chart.setOption(adapterOption);
-            // this.chart.resize();
+            this.chart.setOption(adapterOption);
+            this.chart.resize();
         }
     },
 };
