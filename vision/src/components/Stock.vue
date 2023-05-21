@@ -7,12 +7,11 @@
 
 <script>
 export default {
-    name: 'Map',
-    components: '',
+    name: 'Stock',
     data() {
         return {
             chart: null,
-            allData: [],
+            allData: null,
         };
     },
     mounted() {
@@ -28,21 +27,54 @@ export default {
         initChart() {
             this.chart = this.$echarts.init(this.$refs.chart);
             let initOption = {
-
+                title: {
+                    text: '▎库存销售量',
+                    top: 20,
+                    left: 20
+                },
             };
             this.chart.setOption(initOption);
         },
         //获取数据
         async getData() {
             let { data: res } = await this.$http({
-                url: '/map'
+                url: '/stock'
             });
             this.allData = res;
+            this.updateChart();
         },
         //更新图表
         updateChart() {
-            let dataOption = {
+            const centerArr = [
+                ['18%', '40%'],
+                ['50%', '40%'],
+                ['82%', '40%'],
+                ['34%', '75%'],
+                ['66%', '75%']
+            ]
+            const colorArr = [
+                ['#4FF778', '#0BA82C'],
+                ['#E5DD45', '#E8B11C'],
+                ['#E8821C', '#E55445'],
+                ['#5052EE', '#AB6EE5'],
+                ['#23E5E5', '#2E72BF']
+            ]
+            const dateArr = this.allData.slice(0, 5)
 
+            const seriesArr = dateArr.map((item, index) => {
+                return {
+                    type: 'pie',
+                    radius: [110, 100],
+                    center: centerArr[index],
+                    data: [
+                        { value: item.sales },
+                        { value: item.stock }
+                    ]
+
+                }
+            })
+            let dataOption = {
+                series: seriesArr
             };
             this.chart.setOption(dataOption);
         },
