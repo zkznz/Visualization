@@ -4,7 +4,7 @@
         </div>
         <span class="iconfont arr-left" @click="toLeft">&#xe6ef;</span>
         <span class="iconfont arr-right" @click="toRight">&#xe6ed;</span>
-        <span class="cat-name">我是标题</span>
+        <span class="cat-name">{{ cartName }}</span>
     </div>
 </template>
 
@@ -14,9 +14,17 @@ export default {
     data() {
         return {
             chart: null,
-            allData: [],
+            allData: null,
             currentIndex: 0, //一级分类下标
         };
+    },
+    computed: {
+        cartName() {
+            if (!this.allData)
+                return '';
+            else
+                return this.allData[this.currentIndex].name
+        }
     },
     mounted() {
         this.initChart();
@@ -31,8 +39,40 @@ export default {
         initChart() {
             this.chart = this.$echarts.init(this.$refs.chart, 'dark');
             let initOption = {
+                title: {
+                    text: '▎ 热销商品的占比',
+                    left: 20,
+                    top: 20
+                },
+                legend: {
+                    top: '15%',
+                    icon: 'circle'
+                },
+                tooltip: {
+                    show: true,
+                    formatter(arg) {
+                        let sum = 0
+                        arg.data.children.forEach(item => {
+                            sum += item.value;
+                        })
+                        let str = ""
+                        arg.data.children.forEach(item => {
+                            str += `${item.name}:${parseInt(item.value / sum * 100)}%<br/>`
+                        })
+                        return str;
+                    }
+                },
                 series: [{
-                    type: 'pie'
+                    type: 'pie',
+                    label: {
+                        show: false,
+                        color: 'inherit'
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                        },
+                    }
                 }]
             };
             this.chart.setOption(initOption);
@@ -52,6 +92,7 @@ export default {
                 return {
                     name: item.name,
                     value: item.value,
+                    children: item.children
                 }
             })
             let dataOption = {
@@ -68,7 +109,11 @@ export default {
         screenAdapter() {
             let titleFontSize = this.$refs.chart.offsetWidth / 100 * 3.6;
             let adapterOption = {
-
+                series: {
+                    label: {
+                        fontSize: 20
+                    }
+                }
             };
             this.chart.setOption(adapterOption);
             this.chart.resize();
