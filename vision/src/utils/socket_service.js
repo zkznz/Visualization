@@ -8,7 +8,8 @@ export default class SocketService {
     }
 
     ws = null;
-
+    // 存储回调函数
+    callBackMapping = {}
     //定义连接服务器方法
     connect() {
         //连接服务器
@@ -24,8 +25,32 @@ export default class SocketService {
             console.log("连接关闭");
         })
         this.ws.onmessage(msg => {
+            const recvData = JSON.parse(msg.data)
+            const socketType = recvData.socketType;
+            if (this.callBackMapping[socketType]) {
+                const action = recvData.action;
+                if (action === 'getData') {
+                    const realData = JSON.parse(recvData.data);
+                }
+                else if (action === 'fullScreen') {
 
+                }
+                else if (action === 'themeChange') {
+                    this.callBackMapping[socketType].call(this, recvData)
+                }
+            }
+            console.log(msg.data)
         })
+    }
+
+    // 回调函数的注册
+    registerCallBack(socketType, callBack) {
+        this.callBackMapping[socketType] = callBack;
+    }
+
+    // 取消某一个回调函数
+    unRegisterCallBack(socketType) {
+        this.callBackMapping[socketType] = null;
     }
 
 }
