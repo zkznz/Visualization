@@ -8,9 +8,11 @@ module.exports.listen = () => {
     //监听客户端连接
     wss.on('connection', client => {
         console.log('有客户端连接');
+        console.log(client);
         //监听客户端发送的消息
         client.on('message', async msg => {
             let payLoad = JSON.parse(msg);
+            console.log(payLoad);
             let action = payLoad.action;
             //需要返回图表JSON数据
             if (action === 'getData') {

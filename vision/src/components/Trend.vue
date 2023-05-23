@@ -56,13 +56,25 @@ export default {
             }
         }
     },
+    created() {
+        //注册回调函数
+        this.$socket.registerCallBack('trendData', this.getData);
+    },
     mounted() {
         this.initChart();
-        this.getData();
+        //用websocket发送消息给服务器
+        this.$socket.send({
+            action: 'getData',
+            socketType: 'trendData',
+            chartName: 'trend',
+            value: ''
+        })
         window.addEventListener('resize', this.screenAdapter);
         this.screenAdapter();
     },
     destroyed() {
+        //注销回调函数
+        this.$socket.unRegisterCallBack('trendData');
         window.removeEventListener('resize', this.screenAdapter);
     },
     methods: {
@@ -94,8 +106,7 @@ export default {
             }
             this.chart.setOption(initOption);
         },
-        async getData() {
-            let { data: res } = await this.$http({ url: '/trend', method: 'get' });
+        getData(res) {
             this.allData = res;
             this.updateChart();
         },
