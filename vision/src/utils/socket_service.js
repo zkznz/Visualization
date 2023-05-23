@@ -1,3 +1,4 @@
+
 export default class SocketService {
     static instance = null
     static get Instance() {
@@ -27,16 +28,19 @@ export default class SocketService {
         this.ws.onmessage(msg => {
             const recvData = JSON.parse(msg.data)
             const socketType = recvData.socketType;
+            //判断是否有该回调函数
             if (this.callBackMapping[socketType]) {
                 const action = recvData.action;
                 if (action === 'getData') {
                     const realData = JSON.parse(recvData.data);
+                    //调用存储的回调函数
+                    this.callBackMapping[socketType].call(this, realData);
                 }
                 else if (action === 'fullScreen') {
 
                 }
                 else if (action === 'themeChange') {
-                    this.callBackMapping[socketType].call(this, recvData)
+                    // this.callBackMapping[socketType].call(this, recvData)
                 }
             }
             console.log(msg.data)
@@ -52,5 +56,8 @@ export default class SocketService {
     unRegisterCallBack(socketType) {
         this.callBackMapping[socketType] = null;
     }
-
+    //发送给服务器数据
+    send(data) {
+        this.ws.send(JSON.stringify(data));
+    }
 }
